@@ -1,11 +1,15 @@
 open! Core
 open! Hardcaml
-open! Hardcaml_demo_project
+open! Aofpga_2025
 
-let generate_range_finder_rtl () =
-  let module C = Circuit.With_interface (Range_finder.I) (Range_finder.O) in
+let generate_d3_rtl () =
+  let module C = Circuit.With_interface (D3.Pipeline.I) (D3.Pipeline.O) in
   let scope = Scope.create ~auto_label_hierarchical_ports:true () in
-  let circuit = C.create_exn ~name:"range_finder_top" (Range_finder.hierarchical scope) in
+  let circuit =
+    C.create_exn
+      ~name:"d3_pipeline_top"
+      (D3.Pipeline.hierarchical ~config:{ input_length = 4; output_length = 2 } scope)
+  in
   let rtl_circuits =
     Rtl.create ~database:(Scope.circuit_database scope) Verilog [ circuit ]
   in
@@ -13,15 +17,12 @@ let generate_range_finder_rtl () =
   print_endline rtl
 ;;
 
-let range_finder_rtl_command =
+let d3_rtl_command =
   Command.basic
     ~summary:""
     [%map_open.Command
       let () = return () in
-      fun () -> generate_range_finder_rtl ()]
+      fun () -> generate_d3_rtl ()]
 ;;
 
-let () =
-  Command_unix.run
-    (Command.group ~summary:"" [ "range-finder", range_finder_rtl_command ])
-;;
+let () = Command_unix.run (Command.group ~summary:"" [ "d3", d3_rtl_command ])

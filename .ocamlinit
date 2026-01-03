@@ -1,0 +1,8 @@
+(* Some convenient setup for experimenting interactively *)
+#require "core.top";;
+#require "ppx_jane";;
+open Base;;
+
+#require "hardcaml";;
+open Hardcaml;;
+#install_printer Bits.pp;;
