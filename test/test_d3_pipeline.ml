@@ -17,7 +17,6 @@ let simple_testbench (sim : Harness.Sim.t) ~(commands : command_sequence) =
   let inputs = Cyclesim.inputs sim in
   let outputs = Cyclesim.outputs sim in
   let cycle ?n () = Cyclesim.cycle ?n sim in
-  let ascii_delay = { contents = 1 } in
   let print () =
     if Bits.to_bool !(outputs.sum_out.valid)
     then (
@@ -30,6 +29,7 @@ let simple_testbench (sim : Harness.Sim.t) ~(commands : command_sequence) =
       print ()
     done
   in
+  let ascii_delay = { contents = 1 } in
   let feed_input c =
     inputs.ascii_input.value <--. c;
     inputs.ascii_input.valid := Bits.vdd;

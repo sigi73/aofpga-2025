@@ -249,7 +249,7 @@ module Pipeline = struct
     let spec = Reg_spec.create ~clock ~reset () in
     let sum_input_wire = Signal.wire sum_width in
     let sum_input_valid = Signal.wire 1 in
-    let sum_reg = Signal.reg spec ~enable:sum_input_valid sum_input_wire in
+    let sum_reg = Signal.reg spec ~enable:sum_input_valid ~clear:reset sum_input_wire in
     let input_stage =
       InputStage.hierarchical
         scope
