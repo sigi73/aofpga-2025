@@ -165,6 +165,7 @@ module InputStage = struct
     let%hw_var valid_index_buffer = Variable.reg spec ~width:1 in
     let%hw_var flush_buffer = Variable.reg spec ~width:1 in
     let%hw_var input_is_done_reg = Variable.reg spec ~width:1 in
+    let%hw_var prev_was_newline = Variable.reg spec ~width:1 in
     compile
       [ input_is_done_reg <-- gnd
       ; flush_buffer <-- gnd
@@ -186,6 +187,7 @@ module InputStage = struct
                 <-- index_buffer.value +: of_unsigned_int ~width:index_width 1
               ; valid_index_buffer <-- vdd
               ; flush_buffer <-- gnd
+              ; prev_was_newline <-- gnd
               ]
               [ if_
                   (ascii_input.value
@@ -194,8 +196,9 @@ module InputStage = struct
                     valid_value_buffer <-- gnd
                   ; valid_index_buffer <-- gnd
                   ; index_buffer <-- of_unsigned_int ~width:index_width index_reset_val
+                  ; prev_was_newline <-- vdd
                   ; if_
-                      flush_buffer.value
+                      prev_was_newline.value
                       [ (* Second consecutive newline should indicate end *)
                         input_is_done_reg <-- vdd
                       ]
