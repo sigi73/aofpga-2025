@@ -3,12 +3,14 @@ open! Hardcaml
 open! Aofpga_2025
 
 let generate_d3_rtl () =
-  let module C = Circuit.With_interface (D3.Pipeline.I) (D3.Pipeline.O) in
+  let module C = Circuit.With_interface (D3.TopWithoutUart.I) (D3.TopWithoutUart.O) in
   let scope = Scope.create ~auto_label_hierarchical_ports:true () in
   let circuit =
     C.create_exn
-      ~name:"d3_pipeline_top"
-      (D3.Pipeline.hierarchical ~config:{ input_length = 4; output_length = 2 } scope)
+      ~name:"d3_pipeline_top_no_uart"
+      (D3.TopWithoutUart.hierarchical
+         ~config:{ input_length = 100; p1_output_length = 2; p2_output_length = 12 }
+         scope)
   in
   let rtl_circuits =
     Rtl.create ~database:(Scope.circuit_database scope) Verilog [ circuit ]
