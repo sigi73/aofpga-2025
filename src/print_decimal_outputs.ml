@@ -24,10 +24,7 @@ module I = struct
 end
 
 module O = struct
-  type 'a t =
-    { byte_out : 'a With_valid.t [@bits 8]
-    ; output_is_done : 'a
-    }
+  type 'a t = { byte_out : 'a With_valid.t [@bits 8] }
   [@@deriving hardcaml ~rtlmangle:"$"]
 end
 
@@ -107,10 +104,8 @@ let create scope ({ clock; clear; part1; part2 } : _ I.t) : _ O.t =
       mux2 (enable &: (x <>:. total_chars)) (x +:. 1) x)
   in
   let byte = output_string |> split_msb ~exact:true ~part_width:8 |> mux counter in
-  let is_done = reg spec (counter ==:. total_chars) in
   { byte_out =
       { valid = enable &: (counter <>:. total_chars) &: (byte <>:. 0); value = byte }
-  ; output_is_done = is_done
   }
   |> O.Of_signal.reg spec
 ;;
