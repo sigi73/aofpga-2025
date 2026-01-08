@@ -86,7 +86,8 @@ let%expect_test "4in-2out Test 1" =
     ~waves_config:waves_config_no_waves
     ~create:create_fn
     (simple_testbench_fixed_delays ~delays ~ascii_input:"1231\n\n");
-  [%expect {|
+  [%expect
+    {|
     Part 1: 31
     Part 2: 231
     Part 1: 31
@@ -113,7 +114,8 @@ let%expect_test "4in-2out Test 2" =
     ~waves_config:waves_config_no_waves
     ~create:create_fn
     (simple_testbench_fixed_delays ~delays ~ascii_input:"9879\n\n");
-  [%expect {|
+  [%expect
+    {|
     Part 1: 99
     Part 2: 989
     Part 1: 99
@@ -140,7 +142,8 @@ let%expect_test "4-in-2out x2" =
     ~waves_config:waves_config_no_waves
     ~create:create_fn
     (simple_testbench_fixed_delays ~delays ~ascii_input:"1231\n9879\n\n");
-  [%expect {|
+  [%expect
+    {|
     Part 1: 130
     Part 2: 1220
     Part 1: 130
@@ -170,7 +173,8 @@ let%expect_test "Sample" =
        ~delays
        ~ascii_input:
          "987654321111111\n811111111111119\n234234234234278\n818181911112111\n\n");
-  [%expect {|
+  [%expect
+    {|
     Part 1: 357
     Part 2: 3121910778619
     Part 1: 357
@@ -193,25 +197,58 @@ let%expect_test "Full input" =
     { input_length = 100; p1_output_length = 2; p2_output_length = 12 }
   in
   let create_fn = DUT.hierarchical ~config in
-  let ascii_input = In_channel.read_all "aoc-inputs/d3.txt" in
+  let ascii_input =
+    let s = In_channel.read_all "aoc-inputs/d3.txt" in
+    if String.is_suffix s ~suffix:"\n\n"
+    then s
+    else if String.is_suffix s ~suffix:"\n"
+    then s ^ "\n"
+    else s ^ "\n\n"
+  in
   Harness.run_advanced
     ~waves_config:waves_config_no_waves
     ~create:create_fn
     (simple_testbench_fixed_delays ~delays ~ascii_input);
+  [%expect
+    {|
+    Part 1: 17524
+    Part 2: 173848577117276
+    Part 1: 17524
+    Part 2: 173848577117276
+    Part 1: 17524
+    Part 2: 173848577117276
+    Part 1: 17524
+    Part 2: 173848577117276
+    Part 1: 17524
+    Part 2: 173848577117276
+    Part 1: 17524
+    Part 2: 173848577117276
+    Part 1: 17524
+    Part 2: 173848577117276
+    |}]
+;;
+
+let%expect_test "Large input" =
+  (* 15 is about the max for our 60 bit sum bus (1000 15 digit numbers fits in 60 bits) *)
+  let config : DUT.config =
+    { input_length = 1000; p1_output_length = 12; p2_output_length = 15 }
+  in
+  let create_fn = DUT.hierarchical ~config in
+  let ascii_input =
+    let s = In_channel.read_all "aoc-inputs/big_input_d3.txt" in
+    if String.is_suffix s ~suffix:"\n\n"
+    then s
+    else if String.is_suffix s ~suffix:"\n"
+    then s ^ "\n"
+    else s ^ "\n\n"
+  in
+  Harness.run_advanced
+    ~waves_config:waves_config_no_waves
+    ~create:create_fn
+    (simple_testbench_fixed_delays ~delays:[ 1 ] ~ascii_input);
+  (* I think these look like this because we add a bunch of stuff with most significant digit of 9/high number? Weird, something to think about. Verified with my normal AoC solution *)
   [%expect {|
-    Part 1: 17524
-    Part 2: 173848577117276
-    Part 1: 17524
-    Part 2: 173848577117276
-    Part 1: 17524
-    Part 2: 173848577117276
-    Part 1: 17524
-    Part 2: 173848577117276
-    Part 1: 17524
-    Part 2: 173848577117276
-    Part 1: 17524
-    Part 2: 173848577117276
-    Part 1: 17524
-    Part 2: 173848577117276
+    Part 1: 999999999999000
+    Part 2: 999999999999999000
     |}]
 ;;

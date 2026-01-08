@@ -4,4 +4,4 @@
    hardcaml_waveterm re)
  (preprocess
   (pps ppx_hardcaml ppx_jane))
- (inline_tests (deps aoc-inputs/d3.txt)))
+ (inline_tests (deps aoc-inputs/d3.txt aoc-inputs/big_input_d3.txt)))

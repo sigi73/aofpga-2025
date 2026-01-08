@@ -1,3 +1,4 @@
+open! Base
 open! Core
 open! Hardcaml
 open! Hardcaml_waveterm
@@ -227,7 +228,14 @@ let%expect_test "P2 Sample" =
 let%expect_test "P1" =
   let config : DUT.config = { input_length = 100; output_length = 2 } in
   let create_fn = DUT.hierarchical ~config in
-  let ascii_input = In_channel.read_all "aoc-inputs/d3.txt" in
+  let ascii_input =
+    let s = In_channel.read_all "aoc-inputs/d3.txt" in
+    if String.is_suffix s ~suffix:"\n\n"
+    then s
+    else if String.is_suffix s ~suffix:"\n"
+    then s ^ "\n"
+    else s ^ "\n\n"
+  in
   let ascii_delay_tests = [ 1; 2; 3; 4; 8; 16; 30 ] in
   List.iter ascii_delay_tests ~f:(fun delay ->
     Printf.printf "Delay: %d\n" delay;
@@ -258,7 +266,14 @@ let%expect_test "P1" =
 let%expect_test "P2" =
   let config : DUT.config = { input_length = 100; output_length = 12 } in
   let create_fn = DUT.hierarchical ~config in
-  let ascii_input = In_channel.read_all "aoc-inputs/d3.txt" in
+  let ascii_input =
+    let s = In_channel.read_all "aoc-inputs/d3.txt" in
+    if String.is_suffix s ~suffix:"\n\n"
+    then s
+    else if String.is_suffix s ~suffix:"\n"
+    then s ^ "\n"
+    else s ^ "\n\n"
+  in
   let ascii_delay_tests = [ 1; 2; 3; 4; 8; 16; 30 ] in
   List.iter ascii_delay_tests ~f:(fun delay ->
     Printf.printf "Delay: %d\n" delay;
