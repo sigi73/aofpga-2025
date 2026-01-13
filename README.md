@@ -1,4 +1,4 @@
-"Advent of FPGA 2025"
+Advent of FPGA 2025
 ===========================
 Based off the [Hardcaml Template Project](https://github.com/janestreet/hardcaml_template_project/tree/with-extensions)
 ## Overview
@@ -71,7 +71,13 @@ One deviation from the Advent of Code problem is that the input stage knows that
 
 
 #### Overall pipeline
-By connecting the input stage to the chain of PEs, we can feed the input ascii stream into the output PEs. The running sum output of the last PE will then contain the sum for that line. By feeding that running sum back into the first PE, we will then start summing the next line into our existing running sum. When the `is_done` signal is outputted by the final PE, we can print the result.
+By connecting the input stage to the chain of PEs, we can feed the input ascii stream into the output PEs. The running sum output of the last PE will then contain the sum for that line. By feeding that running sum back into the first PE, we will then start summing the next line into our existing running sum. When the `is_done` signal is outputted by the final PE, we can print the result. I have created a diagram below showing a single line of input for a 5 length input, 3 length output.
+
+At each timestep, we shift in a new character out of the input stream. If the UART isn't ready, the rest of the pipeline can just wait. The pipeline should never need to stall the UART. We can see that PE\_0, the most significant digit, first captures the 4 from step 2->3. It skips the 1 in the next step, as that is not a larger digit, but then captures the 5 in in step 4->5. This causes PE\_1 to get flushed. We notice that PE\_0 does not capture the 8 at step 6->7 as that is outside of the allowed index range. Once the end of the input is reached, each cell outputs its running sum to be added by the following cells.
+
+This example only shows one line of input and does not demonstrate the looping back of the sum. However, since the the full following input must flow through PE\_0 before it is ready to add the running sum, and there are strictly fewer outputs than inputs (with a newline between each), there will be enough time for the final PE to output the sum to feed back into the first PE.
+
+![Dataflow diagram](assets/aofpga_day3.drawio.png)
 
 The Print_decimal_outputs module from the [advent-of-hardcaml-2024](https://github.com/asinghani/advent-of-hardcaml-2024/tree/main) repo was used for the output. I also intended to connect the output of this module, and the input of the input stage to the UART module from this repo, but haven't had time to write the tests for it.
 
